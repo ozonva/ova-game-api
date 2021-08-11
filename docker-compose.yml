@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+
+  goapp:
+    build:
+      context: ./
+      dockerfile: docker/golang/Dockerfile
+    volumes:
+      - ./:/app
+
+  golint:
+    build:
+      context: ./docker/golang-lint
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+
+networks:
+  default:
