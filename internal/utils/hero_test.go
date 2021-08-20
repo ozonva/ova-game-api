@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/google/uuid"
 	"github.com/ozonva/ova-game-api/pkg/game"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -11,7 +12,7 @@ func createHeroes(userId uint64, count int) []game.Hero {
 
 	for index := range list {
 		var typeHero game.TypeHero = game.GetTypeHeroesEnums()[index%3]
-		list[index] = game.Create(userId, uint64(index+1), typeHero)
+		list[index] = game.NewHero(userId, typeHero)
 	}
 
 	return list
@@ -22,15 +23,13 @@ func TestHeroesSplitToBulks(t *testing.T) {
 
 	var userId uint64 = 1
 	heroes := createHeroes(userId, 5)
-	expected := make(map[uint64]game.Hero)
-	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-	var typeHero2 game.TypeHero = game.GetTypeHeroesEnums()[1]
-	var typeHero3 game.TypeHero = game.GetTypeHeroesEnums()[2]
-	expected[1] = game.Create(userId, 1, typeHero)
-	expected[2] = game.Create(userId, 2, typeHero2)
-	expected[3] = game.Create(userId, 3, typeHero3)
-	expected[4] = game.Create(userId, 4, typeHero)
-	expected[5] = game.Create(userId, 5, typeHero2)
+	expected := make(map[uuid.UUID]game.Hero)
+	for _, hero := range heroes {
+		if _, ok := expected[hero.ID]; ok {
+			continue
+		}
+		expected[hero.ID] = hero
+	}
 
 	result, err := HeroesSplitToBulks(heroes)
 	assert.Equal(true, err == nil)
@@ -41,7 +40,7 @@ func TestHeroesSplitToBulksEmpty(t *testing.T) {
 	assert := assert.New(t)
 
 	heroes := createHeroes(0, 0)
-	expected := make(map[uint64]game.Hero)
+	expected := make(map[uuid.UUID]game.Hero)
 
 	result, err := HeroesSplitToBulks(heroes)
 	assert.Nil(err)
@@ -53,9 +52,10 @@ func TestHeroesSplitToBulksDuplicate(t *testing.T) {
 	list := make([]game.Hero, 2)
 
 	var iterate uint64
+	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
+	hero := game.NewHero(1, typeHero)
 	for iterate = 0; iterate < 2; iterate++ {
-		var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-		list[iterate] = game.Create(iterate+1, 1, typeHero)
+		list[iterate] = hero
 	}
 
 	result, err := HeroesSplitToBulks(list)
@@ -69,23 +69,9 @@ func TestHeroesSplitToBulksForTypes(t *testing.T) {
 	var userId uint64 = 1
 	heroes := createHeroes(userId, 5)
 	expected := make(map[game.TypeHero][]game.Hero)
-	var typeHero game.TypeHero
 
-	typeHero = game.GetTypeHeroesEnums()[0]
-	expected[typeHero] = []game.Hero{
-		game.Create(userId, 1, typeHero),
-		game.Create(userId, 4, typeHero),
-	}
-
-	typeHero = game.GetTypeHeroesEnums()[1]
-	expected[typeHero] = []game.Hero{
-		game.Create(userId, 2, typeHero),
-		game.Create(userId, 5, typeHero),
-	}
-
-	typeHero = game.GetTypeHeroesEnums()[2]
-	expected[typeHero] = []game.Hero{
-		game.Create(userId, 3, typeHero),
+	for _, hero := range heroes {
+		expected[hero.Type] = append(expected[hero.Type], hero)
 	}
 
 	result, err := HeroesSplitToBulksForTypes(heroes)
@@ -109,9 +95,10 @@ func TestHeroesSplitToBulksForTypesDuplicate(t *testing.T) {
 	list := make([]game.Hero, 2)
 
 	var iterate uint64
+	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
+	hero := game.NewHero(1, typeHero)
 	for iterate = 0; iterate < 2; iterate++ {
-		var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-		list[iterate] = game.Create(iterate+1, 1, typeHero)
+		list[iterate] = hero
 	}
 
 	result, err := HeroesSplitToBulksForTypes(list)
@@ -127,15 +114,9 @@ func TestHeroesToChunksMore(t *testing.T) {
 	assert.Nil(err)
 	assert.Len(result, 2)
 
-	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-	var typeHero2 game.TypeHero = game.GetTypeHeroesEnums()[1]
-	var typeHero3 game.TypeHero = game.GetTypeHeroesEnums()[2]
-	expected := [][]game.Hero{
-		{game.Create(1, uint64(1), typeHero), game.Create(1, uint64(2), typeHero2)},
-		{game.Create(1, uint64(3), typeHero3)},
+	for index, chunk := range result {
+		assert.Equal(2-index, len(chunk))
 	}
-
-	assert.Equal(expected, result)
 }
 
 func TestHeroesToChunksEquals(t *testing.T) {
@@ -146,13 +127,9 @@ func TestHeroesToChunksEquals(t *testing.T) {
 	assert.Nil(err)
 	assert.Len(result, 1)
 
-	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-	var typeHero2 game.TypeHero = game.GetTypeHeroesEnums()[1]
-	expected := [][]game.Hero{
-		{game.Create(1, uint64(1), typeHero), game.Create(1, uint64(2), typeHero2)},
+	for index, chunk := range result {
+		assert.Equal(2-index, len(chunk))
 	}
-
-	assert.Equal(expected, result)
 }
 
 func TestHeroesToChunksLess(t *testing.T) {
@@ -163,12 +140,9 @@ func TestHeroesToChunksLess(t *testing.T) {
 	assert.Nil(err)
 	assert.Len(result, 1)
 
-	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-	expected := [][]game.Hero{
-		{game.Create(1, uint64(1), typeHero)},
+	for _, chunk := range result {
+		assert.Equal(1, len(chunk))
 	}
-
-	assert.Equal(expected, result)
 }
 
 func TestHeroesToChunksEmpty(t *testing.T) {
