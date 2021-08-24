@@ -10,9 +10,9 @@ import (
 )
 
 type AppConfig struct {
-	Name       string `json:"name"`
-	Enviroment string `json:"enviroment"`
-	Debug      bool   `json:"debug"`
+	Name        string `json:"name"`
+	Environment string `json:"environment"`
+	Debug       bool   `json:"debug"`
 }
 
 type fileFuncType func(string) (AppConfig, error)
@@ -68,7 +68,7 @@ func OpenReadJsonFile() fileFuncType {
 			return result, fmt.Errorf("Not parsed file in path: %s", path)
 		}
 
-		if result.Enviroment == "" {
+		if result.Environment == "" {
 			return result, fmt.Errorf("not found struct 'AppConfig' for file on path: %s", path)
 		}
 

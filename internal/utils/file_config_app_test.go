@@ -13,19 +13,19 @@ func TestOpenReadJsonFile(t *testing.T) {
 	file, err := readFileFunc("./../../config/app.json")
 	assert.Nil(err)
 	assert.Equal("apptest", file.Name)
-	assert.Equal("local", file.Enviroment)
+	assert.Equal("local", file.Environment)
 	assert.Equal(false, file.Debug)
 
 	file, err = readFileFunc("./../../config/db.json")
 	assert.NotNil(err)
 	assert.Equal("", file.Name)
-	assert.Equal("", file.Enviroment)
+	assert.Equal("", file.Environment)
 	assert.Equal(false, file.Debug)
 
 	file, err = readFileFunc("./../../config/notfoundfiletest.json")
 	assert.NotNil(err)
 	assert.Equal("", file.Name)
-	assert.Equal("", file.Enviroment)
+	assert.Equal("", file.Environment)
 	assert.Equal(false, file.Debug)
 }
 

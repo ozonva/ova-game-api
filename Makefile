@@ -3,6 +3,8 @@
 release: check build
 check: format lint test
 
+generate:
+	docker-compose run --rm goapp go generate ./...
 format:
 	docker-compose run --rm goapp go fmt ./...
 lint:
