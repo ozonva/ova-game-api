@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package ova.game.api;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/ozonva/ova-game-api/pkg/ova-game-api;ova_game_api";
+
+service HeroApi {
+  rpc CreateHero(CreateHeroRequest) returns (CreateGameResponse);
+  rpc ListHeroes(ListHeroRequest) returns (ListHeroResponse);
+  rpc DescribeHero(DescribeHeroRequest) returns (google.protobuf.Empty);
+  rpc RemoveHero(RemoveHeroRequest) returns (google.protobuf.Empty);
+}
+
+message CreateHeroRequest {
+  Hero task = 1;
+}
+
+message DescribeHeroRequest {
+  string id = 1;
+}
+
+message RemoveHeroRequest {
+  string id = 1;
+}
+
+message ListHeroRequest {
+  uint64 offset = 1;
+  uint64 limit = 2;
+}
+
+message ListHeroResponse {
+  repeated Hero heroes = 1;
+}
+
+message CreateGameResponse {
+  Hero hero = 1;
+}
+
+message Hero {
+  string HeroId = 1;
+  uint64 user_id = 2;
+  string name = 3;
+  TypeHero type = 4;
+}
+
+enum TypeHero {
+  Magician = 0;
+  Fighter = 1;
+  Shooter = 2;
+}
