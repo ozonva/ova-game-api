@@ -1,0 +1,5 @@
+{
+  "name": "appdb",
+  "environment": "local",
+  "debug": false
+}

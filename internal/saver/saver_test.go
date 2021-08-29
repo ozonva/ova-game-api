@@ -16,12 +16,19 @@ func TestSaver(t *testing.T) {
 	RunSpecs(t, "Saver")
 }
 
+func newHeroTest(userId uint64, typeHero game.TypeHero) game.Hero {
+	hero := game.NewHero(userId, typeHero, "")
+	hero.GenerateName()
+
+	return hero
+}
+
 var _ = Describe("Saver", func() {
 	const (
 		capacitySize                 = 2
 		flushTimeoutSecond           = 2 * time.Second
-		flushTimeoutShortMillisecond = 2 * time.Millisecond
-		flushTimeoutLongMillisecond  = 5 * time.Millisecond
+		flushTimeoutShortMillisecond = 20 * time.Millisecond
+		flushTimeoutLongMillisecond  = 50 * time.Millisecond
 	)
 	var (
 		mockCtrl    *gomock.Controller
@@ -30,13 +37,13 @@ var _ = Describe("Saver", func() {
 	)
 	typeHero := game.GetTypeHeroesEnums()[0]
 	heroes := []game.Hero{
-		game.NewHero(1, typeHero),
-		game.NewHero(2, typeHero),
-		game.NewHero(3, typeHero),
-		game.NewHero(4, typeHero),
-		game.NewHero(5, typeHero),
-		game.NewHero(6, typeHero),
-		game.NewHero(7, typeHero),
+		newHeroTest(1, typeHero),
+		newHeroTest(2, typeHero),
+		newHeroTest(3, typeHero),
+		newHeroTest(4, typeHero),
+		newHeroTest(5, typeHero),
+		newHeroTest(6, typeHero),
+		newHeroTest(7, typeHero),
 	}
 
 	BeforeEach(func() {
@@ -89,8 +96,8 @@ var _ = Describe("Saver", func() {
 					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutSecond)
 					mockFlusher.EXPECT().Flush(gomock.Any()).Times(1)
 					heroesList := []game.Hero{
-						game.NewHero(1, typeHero),
-						game.NewHero(2, typeHero),
+						newHeroTest(1, typeHero),
+						newHeroTest(2, typeHero),
 					}
 
 					for _, hero := range heroesList {
@@ -106,7 +113,7 @@ var _ = Describe("Saver", func() {
 					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutShortMillisecond)
 					mockFlusher.EXPECT().Flush(gomock.Any()).Times(1)
 					heroesList := []game.Hero{
-						game.NewHero(1, typeHero),
+						newHeroTest(1, typeHero),
 					}
 
 					for _, hero := range heroesList {
@@ -132,12 +139,12 @@ var _ = Describe("Saver", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
 					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutShortMillisecond)
 					heroesList := []game.Hero{
-						game.NewHero(1, typeHero),
-						game.NewHero(2, typeHero),
-						game.NewHero(3, typeHero),
-						game.NewHero(4, typeHero),
-						game.NewHero(5, typeHero),
-						game.NewHero(6, typeHero),
+						newHeroTest(1, typeHero),
+						newHeroTest(2, typeHero),
+						newHeroTest(3, typeHero),
+						newHeroTest(4, typeHero),
+						newHeroTest(5, typeHero),
+						newHeroTest(6, typeHero),
 					}
 					oneHero := heroesList[:1]
 					mockFlusher.EXPECT().Flush(gomock.Any()).Return(oneHero).Times(1)
@@ -157,7 +164,7 @@ var _ = Describe("Saver", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
 					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutShortMillisecond)
 					heroesList := []game.Hero{
-						game.NewHero(1, typeHero),
+						newHeroTest(1, typeHero),
 					}
 					oneHero := heroesList[:1]
 					mockFlusher.EXPECT().Flush(gomock.Any()).Return(oneHero).Times(3)

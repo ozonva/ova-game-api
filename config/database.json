@@ -1,0 +1,8 @@
+{
+  "db_name": "DB_NAME",
+  "host": "DB_HOST",
+  "port": "DB_PORT",
+  "username": "DB_USER",
+  "password": "DB_PASSWORD",
+  "pool_max_connect": "DB_POOL_MAX_CONNECT"
+}

@@ -49,19 +49,19 @@ func (mr *MockHeroRepoMockRecorder) AddHeroes(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddHeroes", reflect.TypeOf((*MockHeroRepo)(nil).AddHeroes), arg0)
 }
 
-// DescribeHeroes mocks base method.
-func (m *MockHeroRepo) DescribeHeroes(arg0 uuid.UUID) (*game.Hero, error) {
+// DescribeHero mocks base method.
+func (m *MockHeroRepo) DescribeHero(arg0 uuid.UUID) (*game.Hero, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DescribeHeroes", arg0)
+	ret := m.ctrl.Call(m, "DescribeHero", arg0)
 	ret0, _ := ret[0].(*game.Hero)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// DescribeHeroes indicates an expected call of DescribeHeroes.
-func (mr *MockHeroRepoMockRecorder) DescribeHeroes(arg0 interface{}) *gomock.Call {
+// DescribeHero indicates an expected call of DescribeHero.
+func (mr *MockHeroRepoMockRecorder) DescribeHero(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeHeroes", reflect.TypeOf((*MockHeroRepo)(nil).DescribeHeroes), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeHero", reflect.TypeOf((*MockHeroRepo)(nil).DescribeHero), arg0)
 }
 
 // ListHeroes mocks base method.
@@ -77,4 +77,18 @@ func (m *MockHeroRepo) ListHeroes(arg0, arg1 uint64) ([]game.Hero, error) {
 func (mr *MockHeroRepoMockRecorder) ListHeroes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListHeroes", reflect.TypeOf((*MockHeroRepo)(nil).ListHeroes), arg0, arg1)
+}
+
+// RemoveHero mocks base method.
+func (m *MockHeroRepo) RemoveHero(arg0 uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveHero", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveHero indicates an expected call of RemoveHero.
+func (mr *MockHeroRepoMockRecorder) RemoveHero(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveHero", reflect.TypeOf((*MockHeroRepo)(nil).RemoveHero), arg0)
 }

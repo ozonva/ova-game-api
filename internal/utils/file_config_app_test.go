@@ -5,24 +5,24 @@ import (
 	"testing"
 )
 
-func TestOpenReadJsonFile(t *testing.T) {
+func TestOpenReadJsonFileApp(t *testing.T) {
 	assert := assert.New(t)
 
-	readFileFunc := OpenReadJsonFile()
+	readFileFunc := OpenReadJsonFileApp()
 
-	file, err := readFileFunc("./../../config/app.json")
+	file, err := readFileFunc("./testfiles/app.json")
 	assert.Nil(err)
-	assert.Equal("apptest", file.Name)
+	assert.Equal("appdb", file.Name)
 	assert.Equal("local", file.Environment)
 	assert.Equal(false, file.Debug)
 
-	file, err = readFileFunc("./../../config/db.json")
+	file, err = readFileFunc("./testfiles/database.json")
 	assert.NotNil(err)
 	assert.Equal("", file.Name)
 	assert.Equal("", file.Environment)
 	assert.Equal(false, file.Debug)
 
-	file, err = readFileFunc("./../../config/notfoundfiletest.json")
+	file, err = readFileFunc("./testfiles/notfoundfiletest.json")
 	assert.NotNil(err)
 	assert.Equal("", file.Name)
 	assert.Equal("", file.Environment)
@@ -32,15 +32,15 @@ func TestOpenReadJsonFile(t *testing.T) {
 func TestOpenFileInCycleByCount(t *testing.T) {
 	assert := assert.New(t)
 
-	files, err := OpenFileInCycleByCount("./../../config/app.json")
+	files, err := OpenFileInCycleByCount("./testfiles/app.json")
 	assert.Equal(5, len(files))
 	assert.Nil(err)
 
-	files, err = OpenFileInCycleByCount("./../../config/db.json")
+	files, err = OpenFileInCycleByCount("./testfiles/database.json")
 	assert.Equal(0, len(files))
 	assert.NotNil(err)
 
-	files, err = OpenFileInCycleByCount("./../../config/notfoundfiletest.json")
+	files, err = OpenFileInCycleByCount("./testfiles/notfoundfiletest.json")
 	assert.Equal(0, len(files))
 	assert.NotNil(err)
 }

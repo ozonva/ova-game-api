@@ -3,7 +3,7 @@ package saver
 import (
 	"github.com/ozonva/ova-game-api/internal/flusher"
 	"github.com/ozonva/ova-game-api/pkg/game"
-	"log"
+	"github.com/rs/zerolog/log"
 	"sync"
 	"time"
 )
@@ -65,7 +65,7 @@ func (s *saver) flush() {
 
 	if len(unsaved) > 0 {
 		s.countUnsafe++
-		log.Printf("warning: some entities can't be saved to database and will be discraded: \n%v\n", unsaved)
+		log.Info().Msgf("warning: some entities can't be saved to database and will be discraded: \n%v\n", unsaved)
 		if s.countUnsafe <= countUnsafe {
 			s.localStorage = append(s.localStorage, unsaved...)
 		}

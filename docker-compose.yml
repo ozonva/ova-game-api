@@ -37,7 +37,9 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_DB: appdb
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 1234
     ports:
       - "127.0.0.1:5432:5432"
 

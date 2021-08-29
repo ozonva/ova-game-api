@@ -15,10 +15,10 @@ type AppConfig struct {
 	Debug       bool   `json:"debug"`
 }
 
-type fileFuncType func(string) (AppConfig, error)
+type FileFuncType func(string) (AppConfig, error)
 
 func OpenFileContinuingCycle(path string) {
-	readFileFunc := OpenReadJsonFile()
+	readFileFunc := OpenReadJsonFileApp()
 
 	for {
 		result, err := readFileFunc(path)
@@ -34,7 +34,7 @@ func OpenFileContinuingCycle(path string) {
 func OpenFileInCycleByCount(path string) ([]AppConfig, error) {
 	list := make([]AppConfig, 5)
 
-	readFileFunc := OpenReadJsonFile()
+	readFileFunc := OpenReadJsonFileApp()
 
 	for i := 0; i < 5; i++ {
 		result, err := readFileFunc(path)
@@ -48,7 +48,7 @@ func OpenFileInCycleByCount(path string) ([]AppConfig, error) {
 	return list, nil
 }
 
-func OpenReadJsonFile() fileFuncType {
+func OpenReadJsonFileApp() FileFuncType {
 	return func(path string) (AppConfig, error) {
 		var result AppConfig
 		jsonFile, err := os.Open(path)

@@ -15,6 +15,13 @@ func TestFlusher(t *testing.T) {
 	RunSpecs(t, "Flusher")
 }
 
+func newHeroTest(userId uint64, typeHero game.TypeHero) game.Hero {
+	hero := game.NewHero(userId, typeHero, "")
+	hero.GenerateName()
+
+	return hero
+}
+
 var _ = Describe("Flusher", func() {
 	const chunkSize = 2
 	var (
@@ -24,11 +31,11 @@ var _ = Describe("Flusher", func() {
 	)
 	typeHero := game.GetTypeHeroesEnums()[0]
 	heroes := []game.Hero{
-		game.NewHero(1, typeHero),
-		game.NewHero(2, typeHero),
-		game.NewHero(3, typeHero),
-		game.NewHero(4, typeHero),
-		game.NewHero(5, typeHero),
+		newHeroTest(1, typeHero),
+		newHeroTest(2, typeHero),
+		newHeroTest(3, typeHero),
+		newHeroTest(4, typeHero),
+		newHeroTest(5, typeHero),
 	}
 
 	BeforeEach(func() {

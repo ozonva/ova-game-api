@@ -28,7 +28,7 @@ func HeroesSplitToBulksForTypes(heroes []game.Hero) (map[game.TypeHero][]game.He
 			return nil, fmt.Errorf("duplicate id %d", hero.ID)
 		}
 		hasMap[hero.ID] = struct{}{}
-		out[hero.Type] = append(out[hero.Type], hero)
+		out[hero.TypeHero] = append(out[hero.TypeHero], hero)
 	}
 
 	return out, nil

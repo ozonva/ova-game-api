@@ -1,9 +1,29 @@
+include .env
+
 .PHONY: format, lint, test, run
 
 release: check build
 check: format lint generate-all test-all
 generate-all: generate-mock generate-proto clean
 test-all: test test-race clean
+up-all: up migration-up
+
+up:
+	docker-compose up -d
+down:
+	docker-compose down --remove-orphans
+migration-status:
+	docker-compose run --rm goapp goose -dir=migrations postgres "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" status
+migration-create-%:
+	docker-compose run --rm goapp goose -dir=migrations postgres "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" create $* sql
+migration-up:
+	docker-compose run --rm goapp goose -dir=migrations postgres "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" up
+migration-down:
+	docker-compose run --rm goapp goose -dir=migrations postgres "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" down
+init-build:
+	docker-compose build --pull --no-cache --parallel
+init-build-%:
+	docker-compose build --pull --no-cache --parallel $*
 
 format:
 	docker-compose run --rm goapp go fmt ./...
@@ -15,16 +35,8 @@ test-race:
 	docker-compose run --rm goapp go test -race -v ./...
 clean:
 	docker-compose run --rm goapp go clean -testcache
-up:
-	docker-compose up -d
-down:
-	docker-compose down --remove-orphans
 run:
 	docker-compose run --rm goapp go run cmd/ova-template-api/main.go
-init-build:
-	docker-compose build --pull --no-cache --parallel
-init-build-%:
-	docker-compose build --pull --no-cache --parallel $*
 build:
 	docker-compose run --rm goapp go mod tidy -v
 	docker-compose run --rm goapp go build -o ./bin/app cmd/ova-template-api/main.go
