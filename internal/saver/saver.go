@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const countUnsafe = 3
+
 type Saver interface {
 	Save(hero game.Hero)
 	Close()
@@ -15,12 +17,14 @@ type Saver interface {
 
 func NewSaver(capacity uint, flusher flusher.Flusher, flushTimeout time.Duration) Saver {
 	saver := &saver{
-		localStorage: make([]game.Hero, 0, capacity),
-		flusher:      flusher,
-		flushTimeout: flushTimeout,
+		localStorage:  make([]game.Hero, 0, capacity),
+		flusher:       flusher,
+		flushTimeout:  flushTimeout,
+		signalChannel: make(chan struct{}, capacity),
+		countUnsafe:   0,
 	}
 
-	saver.init()
+	go saver.handlerChannel(saver.signalChannel)
 
 	return saver
 }
@@ -31,9 +35,11 @@ type saver struct {
 	localStorage  []game.Hero
 	flusher       flusher.Flusher
 	flushTimeout  time.Duration
+	countUnsafe   uint8
 }
 
 func (s *saver) Save(hero game.Hero) {
+	s.countUnsafe = 0
 	if len(s.localStorage) == cap(s.localStorage) {
 		s.flush()
 	}
@@ -46,12 +52,6 @@ func (s *saver) Close() {
 	close(s.signalChannel)
 }
 
-func (s *saver) init() {
-	s.signalChannel = make(chan struct{})
-
-	go s.handlerChannel(s.signalChannel)
-}
-
 func (s *saver) flush() {
 	s.Lock()
 	defer s.Unlock()
@@ -61,10 +61,15 @@ func (s *saver) flush() {
 	}
 
 	unsaved := s.flusher.Flush(s.localStorage)
-	if len(unsaved) > 0 {
-		log.Printf("warning: some entities can't be saved to database and will be discraded: \n%v\n", unsaved)
-	}
 	s.localStorage = make([]game.Hero, 0, cap(s.localStorage))
+
+	if len(unsaved) > 0 {
+		s.countUnsafe++
+		log.Printf("warning: some entities can't be saved to database and will be discraded: \n%v\n", unsaved)
+		if s.countUnsafe <= countUnsafe {
+			s.localStorage = append(s.localStorage, unsaved...)
+		}
+	}
 }
 
 func (s *saver) handlerChannel(ch <-chan struct{}) {

@@ -6,6 +6,9 @@ services:
     build:
       context: ./
       dockerfile: docker/golang/Dockerfile
+    command: go run cmd/ova-template-api/main.go
+    ports:
+      - "127.0.0.1:3009:82"
     volumes:
       - ./:/app
 
@@ -15,6 +18,34 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/app
+
+  goproto:
+    build:
+      context: ./
+      dockerfile: docker/golang-protoc/Dockerfile
+    volumes:
+      - ./:/app
+
+  gomock:
+    build:
+      context: ./
+      dockerfile: docker/golang-mockgen/Dockerfile
+    volumes:
+      - ./:/app
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
 
 networks:
   default:
