@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HeroApiClient interface {
-	CreateHero(ctx context.Context, in *CreateHeroRequest, opts ...grpc.CallOption) (*CreateGameResponse, error)
+	CreateHero(ctx context.Context, in *CreateHeroRequest, opts ...grpc.CallOption) (*CreateHeroResponse, error)
 	ListHeroes(ctx context.Context, in *ListHeroRequest, opts ...grpc.CallOption) (*ListHeroResponse, error)
 	DescribeHero(ctx context.Context, in *DescribeHeroRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	RemoveHero(ctx context.Context, in *RemoveHeroRequest, opts ...grpc.CallOption) (*empty.Empty, error)
@@ -33,8 +33,8 @@ func NewHeroApiClient(cc grpc.ClientConnInterface) HeroApiClient {
 	return &heroApiClient{cc}
 }
 
-func (c *heroApiClient) CreateHero(ctx context.Context, in *CreateHeroRequest, opts ...grpc.CallOption) (*CreateGameResponse, error) {
-	out := new(CreateGameResponse)
+func (c *heroApiClient) CreateHero(ctx context.Context, in *CreateHeroRequest, opts ...grpc.CallOption) (*CreateHeroResponse, error) {
+	out := new(CreateHeroResponse)
 	err := c.cc.Invoke(ctx, "/ova.game.api.HeroApi/CreateHero", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (c *heroApiClient) RemoveHero(ctx context.Context, in *RemoveHeroRequest, o
 // All implementations must embed UnimplementedHeroApiServer
 // for forward compatibility
 type HeroApiServer interface {
-	CreateHero(context.Context, *CreateHeroRequest) (*CreateGameResponse, error)
+	CreateHero(context.Context, *CreateHeroRequest) (*CreateHeroResponse, error)
 	ListHeroes(context.Context, *ListHeroRequest) (*ListHeroResponse, error)
 	DescribeHero(context.Context, *DescribeHeroRequest) (*empty.Empty, error)
 	RemoveHero(context.Context, *RemoveHeroRequest) (*empty.Empty, error)
@@ -84,7 +84,7 @@ type HeroApiServer interface {
 type UnimplementedHeroApiServer struct {
 }
 
-func (UnimplementedHeroApiServer) CreateHero(context.Context, *CreateHeroRequest) (*CreateGameResponse, error) {
+func (UnimplementedHeroApiServer) CreateHero(context.Context, *CreateHeroRequest) (*CreateHeroResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateHero not implemented")
 }
 func (UnimplementedHeroApiServer) ListHeroes(context.Context, *ListHeroRequest) (*ListHeroResponse, error) {
