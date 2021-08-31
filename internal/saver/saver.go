@@ -1,6 +1,7 @@
 package saver
 
 import (
+	"context"
 	"github.com/ozonva/ova-game-api/internal/flusher"
 	"github.com/ozonva/ova-game-api/pkg/game"
 	"github.com/rs/zerolog/log"
@@ -11,11 +12,11 @@ import (
 const countUnsafe = 3
 
 type Saver interface {
-	Save(hero game.Hero)
-	Close()
+	Save(ctx context.Context, hero game.Hero)
+	Close(ctx context.Context)
 }
 
-func NewSaver(capacity uint, flusher flusher.Flusher, flushTimeout time.Duration) Saver {
+func NewSaver(ctx context.Context, capacity uint, flusher flusher.Flusher, flushTimeout time.Duration) Saver {
 	saver := &saver{
 		localStorage:  make([]game.Hero, 0, capacity),
 		flusher:       flusher,
@@ -24,7 +25,7 @@ func NewSaver(capacity uint, flusher flusher.Flusher, flushTimeout time.Duration
 		countUnsafe:   0,
 	}
 
-	go saver.handlerChannel(saver.signalChannel)
+	go saver.handlerChannel(ctx, saver.signalChannel)
 
 	return saver
 }
@@ -38,21 +39,21 @@ type saver struct {
 	countUnsafe   uint8
 }
 
-func (s *saver) Save(hero game.Hero) {
+func (s *saver) Save(ctx context.Context, hero game.Hero) {
 	s.countUnsafe = 0
 	if len(s.localStorage) == cap(s.localStorage) {
-		s.flush()
+		s.flush(ctx)
 	}
 	s.localStorage = append(s.localStorage, hero)
 	s.signalChannel <- struct{}{}
 }
 
-func (s *saver) Close() {
-	s.flush()
+func (s *saver) Close(ctx context.Context) {
+	s.flush(ctx)
 	close(s.signalChannel)
 }
 
-func (s *saver) flush() {
+func (s *saver) flush(ctx context.Context) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -60,7 +61,7 @@ func (s *saver) flush() {
 		return
 	}
 
-	unsaved := s.flusher.Flush(s.localStorage)
+	unsaved := s.flusher.Flush(ctx, s.localStorage)
 	s.localStorage = make([]game.Hero, 0, cap(s.localStorage))
 
 	if len(unsaved) > 0 {
@@ -72,17 +73,17 @@ func (s *saver) flush() {
 	}
 }
 
-func (s *saver) handlerChannel(ch <-chan struct{}) {
+func (s *saver) handlerChannel(ctx context.Context, ch <-chan struct{}) {
 	ticker := time.NewTicker(s.flushTimeout)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			s.flush()
+			s.flush(ctx)
 		case _, ok := <-ch:
 			if !ok {
-				s.flush()
+				s.flush(ctx)
 				return
 			}
 		}

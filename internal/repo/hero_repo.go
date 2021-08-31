@@ -12,26 +12,24 @@ import (
 
 // HeroRepo - интерфейс хранилища для сущности Hero
 type HeroRepo interface {
-	AddHeroes(heroes []game.Hero) error
-	ListHeroes(limit, offset uint64) ([]game.Hero, error)
-	DescribeHero(heroId uuid.UUID) (*game.Hero, error)
-	RemoveHero(heroId uuid.UUID) error
+	AddHeroes(ctx context.Context, heroes []game.Hero) error
+	ListHeroes(ctx context.Context, limit, offset uint64) ([]game.Hero, error)
+	DescribeHero(ctx context.Context, heroId uuid.UUID) (*game.Hero, error)
+	RemoveHero(ctx context.Context, heroId uuid.UUID) error
 }
 
-func NewHeroRepo(ctx context.Context, pool *pgxpool.Pool) HeroRepo {
+func NewHeroRepo(pool *pgxpool.Pool) HeroRepo {
 	return &repo{
-		ctx:  ctx,
 		pool: pool,
 	}
 }
 
 type repo struct {
-	ctx  context.Context
 	pool *pgxpool.Pool
 }
 
-func (r *repo) AddHeroes(heroes []game.Hero) error {
-	conn, err := r.pool.Acquire(r.ctx)
+func (r *repo) AddHeroes(ctx context.Context, heroes []game.Hero) error {
+	conn, err := r.pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
@@ -51,7 +49,7 @@ func (r *repo) AddHeroes(heroes []game.Hero) error {
 
 	log.Info().Msgf("query: %s; args: %s", sql, args)
 
-	_, err = conn.Exec(r.ctx, sql, args...)
+	_, err = conn.Exec(ctx, sql, args...)
 	if err != nil {
 		log.Info().Msg(err.Error())
 		return err
@@ -60,8 +58,8 @@ func (r *repo) AddHeroes(heroes []game.Hero) error {
 	return nil
 }
 
-func (r *repo) ListHeroes(limit, offset uint64) ([]game.Hero, error) {
-	conn, err := r.pool.Acquire(r.ctx)
+func (r *repo) ListHeroes(ctx context.Context, limit, offset uint64) ([]game.Hero, error) {
+	conn, err := r.pool.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +77,7 @@ func (r *repo) ListHeroes(limit, offset uint64) ([]game.Hero, error) {
 	log.Info().Msgf("query: %s", sql)
 
 	var heroesList []*game.Hero
-	if err = pgxscan.Select(r.ctx, conn, &heroesList, sql); err != nil {
+	if err = pgxscan.Select(ctx, conn, &heroesList, sql); err != nil {
 		return nil, err
 	}
 
@@ -91,8 +89,8 @@ func (r *repo) ListHeroes(limit, offset uint64) ([]game.Hero, error) {
 	return heroes, nil
 }
 
-func (r *repo) DescribeHero(heroId uuid.UUID) (*game.Hero, error) {
-	conn, err := r.pool.Acquire(r.ctx)
+func (r *repo) DescribeHero(ctx context.Context, heroId uuid.UUID) (*game.Hero, error) {
+	conn, err := r.pool.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -110,15 +108,15 @@ func (r *repo) DescribeHero(heroId uuid.UUID) (*game.Hero, error) {
 	log.Info().Msgf("query: %s; args: %s", sql, args)
 
 	hero := game.Hero{}
-	if err = pgxscan.Get(r.ctx, conn, &hero, sql, args...); err != nil {
+	if err = pgxscan.Get(ctx, conn, &hero, sql, args...); err != nil {
 		return nil, err
 	}
 
 	return &hero, nil
 }
 
-func (r *repo) RemoveHero(heroId uuid.UUID) error {
-	conn, err := r.pool.Acquire(r.ctx)
+func (r *repo) RemoveHero(ctx context.Context, heroId uuid.UUID) error {
+	conn, err := r.pool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
@@ -134,7 +132,7 @@ func (r *repo) RemoveHero(heroId uuid.UUID) error {
 
 	log.Info().Msgf("query: %s; args: %s", sql, args)
 
-	_, err = conn.Exec(r.ctx, sql, args...)
+	_, err = conn.Exec(ctx, sql, args...)
 	if err != nil {
 		return err
 	}

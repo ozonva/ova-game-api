@@ -43,9 +43,9 @@ func Run() error {
 
 	log.Info().Msgf("start serve port %s", grpcPort)
 	s := grpc.NewServer()
-	repository := repo.NewHeroRepo(ctx, pool)
+	repository := repo.NewHeroRepo(pool)
 	fsh := flusher.NewFlusher(5, repository)
-	svr := saver.NewSaver(5, fsh, 2)
+	svr := saver.NewSaver(ctx, 5, fsh, 2)
 	api.RegisterHeroApiServer(s, NewHeroApiServer(&log, repository, svr))
 	if err := s.Serve(listen); err != nil {
 		log.Fatal().Msgf("failed to serve: %v", err)

@@ -1,6 +1,7 @@
 package flusher
 
 import (
+	"context"
 	"fmt"
 	"github.com/ozonva/ova-game-api/internal/repo"
 	"github.com/ozonva/ova-game-api/internal/utils"
@@ -14,7 +15,7 @@ type flusher struct {
 
 // Flusher - интерфейс для сброса задач в хранилище
 type Flusher interface {
-	Flush(heroes []game.Hero) []game.Hero
+	Flush(ctx context.Context, heroes []game.Hero) []game.Hero
 }
 
 // NewFlusher возвращает Flusher с поддержкой батчевого сохранения
@@ -25,7 +26,7 @@ func NewFlusher(chunkSize uint, repository repo.HeroRepo) Flusher {
 	}
 }
 
-func (f *flusher) Flush(heroes []game.Hero) []game.Hero {
+func (f *flusher) Flush(ctx context.Context, heroes []game.Hero) []game.Hero {
 	var result []game.Hero
 
 	chunks, err := utils.HeroesToChunks(heroes, int(f.chunkSize))
@@ -34,7 +35,7 @@ func (f *flusher) Flush(heroes []game.Hero) []game.Hero {
 	}
 
 	for _, chunk := range chunks {
-		if err := f.repository.AddHeroes(chunk); err != nil {
+		if err := f.repository.AddHeroes(ctx, chunk); err != nil {
 			fmt.Printf("flush error: %s\n", err)
 			result = append(result, chunk...)
 		}

@@ -42,7 +42,7 @@ var _ = Describe("HeroServer", func() {
 		mockRepo = mocks.NewMockHeroRepo(ctrl)
 		ctx = context.Background()
 		flusher_ := flusher.NewFlusher(10, mockRepo)
-		saver := saver.NewSaver(capacitySize, flusher_, flushTimeoutShortMillisecond)
+		saver := saver.NewSaver(ctx, capacitySize, flusher_, flushTimeoutShortMillisecond)
 
 		api = NewHeroApiServer(&log, mockRepo, saver)
 	})
@@ -55,9 +55,9 @@ var _ = Describe("HeroServer", func() {
 		It("save hero", func() {
 			typeHero := game.GetTypeHeroesEnums()[0]
 			hero := newHeroTest(123, typeHero)
-			mockRepo.EXPECT().AddHeroes([]game.Hero{hero}).Times(1)
+			mockRepo.EXPECT().AddHeroes(ctx, []game.Hero{hero}).Times(1)
 
-			_, err := api.CreateHero(ctx, &ovagameapi.CreateHeroRequest{
+			res, err := api.CreateHero(ctx, &ovagameapi.CreateHeroRequest{
 				UserId:      123,
 				Name:        "awesome",
 				TypeHero:    "Fighter",
@@ -66,12 +66,16 @@ var _ = Describe("HeroServer", func() {
 			time.Sleep(flushTimeoutLongMillisecond)
 
 			Expect(err).ShouldNot(HaveOccurred())
+
+			Expect(res.Hero.Id).To(Equal(hero.ID))
+			Expect(res.Hero.Name).To(Equal(hero.Name))
+			Expect(res.Hero.UserId).To(Equal(hero.UserID))
 		})
 
 		It("DescribeHero", func() {
 			typeHero := game.GetTypeHeroesEnums()[0]
 			hero := newHeroTest(123, typeHero)
-			mockRepo.EXPECT().DescribeHero(hero.ID).Return(&hero, nil).Times(1)
+			mockRepo.EXPECT().DescribeHero(ctx, hero.ID).Return(&hero, nil).Times(1)
 
 			_, err := api.DescribeHero(ctx, &ovagameapi.DescribeHeroRequest{
 				Id: hero.ID.String(),
@@ -82,7 +86,7 @@ var _ = Describe("HeroServer", func() {
 		It("ListRules", func() {
 			typeHero := game.GetTypeHeroesEnums()[0]
 			hero := newHeroTest(123, typeHero)
-			mockRepo.EXPECT().ListHeroes(0, 10).Return([]game.Hero{hero}, nil).Times(1)
+			mockRepo.EXPECT().ListHeroes(ctx, 0, 10).Return([]game.Hero{hero}, nil).Times(1)
 
 			res, err := api.ListHeroes(ctx, &ovagameapi.ListHeroRequest{
 				Limit:  uint64(10),
@@ -98,7 +102,7 @@ var _ = Describe("HeroServer", func() {
 		It("RemoveHero", func() {
 			typeHero := game.GetTypeHeroesEnums()[0]
 			hero := newHeroTest(123, typeHero)
-			mockRepo.EXPECT().RemoveHero(hero.ID).Return(nil).Times(1)
+			mockRepo.EXPECT().RemoveHero(ctx, hero.ID).Return(nil).Times(1)
 
 			_, err := api.RemoveHero(ctx, &ovagameapi.RemoveHeroRequest{
 				Id: hero.ID.String(),

@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -36,59 +37,59 @@ func (m *MockHeroRepo) EXPECT() *MockHeroRepoMockRecorder {
 }
 
 // AddHeroes mocks base method.
-func (m *MockHeroRepo) AddHeroes(arg0 []game.Hero) error {
+func (m *MockHeroRepo) AddHeroes(arg0 context.Context, arg1 []game.Hero) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddHeroes", arg0)
+	ret := m.ctrl.Call(m, "AddHeroes", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddHeroes indicates an expected call of AddHeroes.
-func (mr *MockHeroRepoMockRecorder) AddHeroes(arg0 interface{}) *gomock.Call {
+func (mr *MockHeroRepoMockRecorder) AddHeroes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddHeroes", reflect.TypeOf((*MockHeroRepo)(nil).AddHeroes), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddHeroes", reflect.TypeOf((*MockHeroRepo)(nil).AddHeroes), arg0, arg1)
 }
 
 // DescribeHero mocks base method.
-func (m *MockHeroRepo) DescribeHero(arg0 uuid.UUID) (*game.Hero, error) {
+func (m *MockHeroRepo) DescribeHero(arg0 context.Context, arg1 uuid.UUID) (*game.Hero, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DescribeHero", arg0)
+	ret := m.ctrl.Call(m, "DescribeHero", arg0, arg1)
 	ret0, _ := ret[0].(*game.Hero)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DescribeHero indicates an expected call of DescribeHero.
-func (mr *MockHeroRepoMockRecorder) DescribeHero(arg0 interface{}) *gomock.Call {
+func (mr *MockHeroRepoMockRecorder) DescribeHero(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeHero", reflect.TypeOf((*MockHeroRepo)(nil).DescribeHero), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeHero", reflect.TypeOf((*MockHeroRepo)(nil).DescribeHero), arg0, arg1)
 }
 
 // ListHeroes mocks base method.
-func (m *MockHeroRepo) ListHeroes(arg0, arg1 uint64) ([]game.Hero, error) {
+func (m *MockHeroRepo) ListHeroes(arg0 context.Context, arg1, arg2 uint64) ([]game.Hero, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListHeroes", arg0, arg1)
+	ret := m.ctrl.Call(m, "ListHeroes", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]game.Hero)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListHeroes indicates an expected call of ListHeroes.
-func (mr *MockHeroRepoMockRecorder) ListHeroes(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockHeroRepoMockRecorder) ListHeroes(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListHeroes", reflect.TypeOf((*MockHeroRepo)(nil).ListHeroes), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListHeroes", reflect.TypeOf((*MockHeroRepo)(nil).ListHeroes), arg0, arg1, arg2)
 }
 
 // RemoveHero mocks base method.
-func (m *MockHeroRepo) RemoveHero(arg0 uuid.UUID) error {
+func (m *MockHeroRepo) RemoveHero(arg0 context.Context, arg1 uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveHero", arg0)
+	ret := m.ctrl.Call(m, "RemoveHero", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RemoveHero indicates an expected call of RemoveHero.
-func (mr *MockHeroRepoMockRecorder) RemoveHero(arg0 interface{}) *gomock.Call {
+func (mr *MockHeroRepoMockRecorder) RemoveHero(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveHero", reflect.TypeOf((*MockHeroRepo)(nil).RemoveHero), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveHero", reflect.TypeOf((*MockHeroRepo)(nil).RemoveHero), arg0, arg1)
 }

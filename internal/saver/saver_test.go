@@ -1,6 +1,7 @@
 package saver
 
 import (
+	"context"
 	_ "fmt"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
@@ -34,6 +35,7 @@ var _ = Describe("Saver", func() {
 		mockCtrl    *gomock.Controller
 		mockFlusher *mocks.MockFlusher
 		testSaver   Saver
+		ctx         context.Context
 	)
 	typeHero := game.GetTypeHeroesEnums()[0]
 	heroes := []game.Hero{
@@ -57,87 +59,87 @@ var _ = Describe("Saver", func() {
 			Context("Save count zero", func() {
 				It("Not Saved", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutSecond)
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(0)
-					testSaver.Close()
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutSecond)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(0)
+					testSaver.Close(ctx)
 				})
 			})
 			Context("Save count less than capacitySize", func() {
 				It("Save hero", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutSecond)
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutSecond)
 
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(1)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(1)
 
 					for _, hero := range heroes {
-						testSaver.Save(hero)
+						testSaver.Save(ctx, hero)
 						break
 					}
 
-					testSaver.Close()
+					testSaver.Close(ctx)
 				})
 			})
 			Context("Save count more equal than capacitySize", func() {
 				It("Save hero", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutSecond)
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(4)
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutSecond)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(4)
 
 					for _, hero := range heroes {
-						testSaver.Save(hero)
+						testSaver.Save(ctx, hero)
 					}
 
-					testSaver.Close()
+					testSaver.Close(ctx)
 				})
 			})
 			Context("Save count equal capacitySize", func() {
 				It("Save hero", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutSecond)
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(1)
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutSecond)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(1)
 					heroesList := []game.Hero{
 						newHeroTest(1, typeHero),
 						newHeroTest(2, typeHero),
 					}
 
 					for _, hero := range heroesList {
-						testSaver.Save(hero)
+						testSaver.Save(ctx, hero)
 					}
 
-					testSaver.Close()
+					testSaver.Close(ctx)
 				})
 			})
 			Context("Save for time", func() {
 				It("Save hero", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutShortMillisecond)
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(1)
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutShortMillisecond)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(1)
 					heroesList := []game.Hero{
 						newHeroTest(1, typeHero),
 					}
 
 					for _, hero := range heroesList {
-						testSaver.Save(hero)
+						testSaver.Save(ctx, hero)
 					}
 
 					time.Sleep(flushTimeoutLongMillisecond)
 
-					testSaver.Close()
+					testSaver.Close(ctx)
 				})
 			})
 			Context("Save for time no data", func() {
 				It("Save no hero", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutShortMillisecond)
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(0)
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutShortMillisecond)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(0)
 					time.Sleep(flushTimeoutLongMillisecond)
-					testSaver.Close()
+					testSaver.Close(ctx)
 				})
 			})
 			Context("Save count more equal than capacitySize and unsafe", func() {
 				It("Save hero and unsafe", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutShortMillisecond)
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutShortMillisecond)
 					heroesList := []game.Hero{
 						newHeroTest(1, typeHero),
 						newHeroTest(2, typeHero),
@@ -147,36 +149,36 @@ var _ = Describe("Saver", func() {
 						newHeroTest(6, typeHero),
 					}
 					oneHero := heroesList[:1]
-					mockFlusher.EXPECT().Flush(gomock.Any()).Return(oneHero).Times(1)
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(3)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Return(oneHero).Times(1)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(3)
 
 					for _, hero := range heroesList {
-						testSaver.Save(hero)
+						testSaver.Save(ctx, hero)
 					}
 
 					time.Sleep(flushTimeoutLongMillisecond)
 
-					testSaver.Close()
+					testSaver.Close(ctx)
 				})
 			})
 			Context("Save count more equal than capacitySize and unsafe limit", func() {
 				It("Save hero and unsafe limit", func() {
 					mockFlusher = mocks.NewMockFlusher(mockCtrl)
-					testSaver = NewSaver(capacitySize, mockFlusher, flushTimeoutShortMillisecond)
+					testSaver = NewSaver(ctx, capacitySize, mockFlusher, flushTimeoutShortMillisecond)
 					heroesList := []game.Hero{
 						newHeroTest(1, typeHero),
 					}
 					oneHero := heroesList[:1]
-					mockFlusher.EXPECT().Flush(gomock.Any()).Return(oneHero).Times(3)
-					mockFlusher.EXPECT().Flush(gomock.Any()).Times(0)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Return(oneHero).Times(3)
+					mockFlusher.EXPECT().Flush(ctx, gomock.Any()).Times(0)
 
 					for _, hero := range heroesList {
-						testSaver.Save(hero)
+						testSaver.Save(ctx, hero)
 					}
 
 					time.Sleep(flushTimeoutLongMillisecond)
 
-					testSaver.Close()
+					testSaver.Close(ctx)
 				})
 			})
 		})
