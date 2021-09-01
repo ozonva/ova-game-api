@@ -7,12 +7,19 @@ import (
 	"testing"
 )
 
+func newHeroTest(userId uint64, typeHero game.TypeHero) game.Hero {
+	hero := game.NewHero(userId, typeHero, "")
+	hero.GenerateName()
+
+	return hero
+}
+
 func createHeroes(userId uint64, count int) []game.Hero {
 	list := make([]game.Hero, count)
 
 	for index := range list {
 		var typeHero game.TypeHero = game.GetTypeHeroesEnums()[index%3]
-		list[index] = game.NewHero(userId, typeHero)
+		list[index] = newHeroTest(userId, typeHero)
 	}
 
 	return list
@@ -53,7 +60,7 @@ func TestHeroesSplitToBulksDuplicate(t *testing.T) {
 
 	var iterate uint64
 	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-	hero := game.NewHero(1, typeHero)
+	hero := newHeroTest(1, typeHero)
 	for iterate = 0; iterate < 2; iterate++ {
 		list[iterate] = hero
 	}
@@ -71,7 +78,7 @@ func TestHeroesSplitToBulksForTypes(t *testing.T) {
 	expected := make(map[game.TypeHero][]game.Hero)
 
 	for _, hero := range heroes {
-		expected[hero.Type] = append(expected[hero.Type], hero)
+		expected[hero.TypeHero] = append(expected[hero.TypeHero], hero)
 	}
 
 	result, err := HeroesSplitToBulksForTypes(heroes)
@@ -96,7 +103,7 @@ func TestHeroesSplitToBulksForTypesDuplicate(t *testing.T) {
 
 	var iterate uint64
 	var typeHero game.TypeHero = game.GetTypeHeroesEnums()[0]
-	hero := game.NewHero(1, typeHero)
+	hero := newHeroTest(1, typeHero)
 	for iterate = 0; iterate < 2; iterate++ {
 		list[iterate] = hero
 	}

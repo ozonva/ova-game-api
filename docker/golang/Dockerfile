@@ -1,6 +1,7 @@
 FROM golang:1.16-alpine
 
-RUN apk add --no-cache build-base git
+RUN apk add --no-cache build-base git \
+    && go get -u github.com/pressly/goose/v3/cmd/goose
 
 WORKDIR /app
 

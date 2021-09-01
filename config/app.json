@@ -1,5 +1,5 @@
 {
-  "name": "apptest",
-  "environment": "local",
-  "debug": false
+  "name": "APP_NAME",
+  "environment": "APP_ENV",
+  "debug": "APP_DEBUG"
 }
