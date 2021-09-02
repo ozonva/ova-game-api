@@ -16,6 +16,7 @@ type HeroRepo interface {
 	ListHeroes(ctx context.Context, limit, offset uint64) ([]game.Hero, error)
 	DescribeHero(ctx context.Context, heroId uuid.UUID) (*game.Hero, error)
 	RemoveHero(ctx context.Context, heroId uuid.UUID) error
+	UpdateHero(ctx context.Context, hero game.Hero) error
 }
 
 func NewHeroRepo(pool *pgxpool.Pool) HeroRepo {
@@ -125,6 +126,35 @@ func (r *repo) RemoveHero(ctx context.Context, heroId uuid.UUID) error {
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	sql, args, err := psql.Delete("heroes").
 		Where(sq.Eq{"id": heroId}).
+		ToSql()
+	if err != nil {
+		return err
+	}
+
+	log.Info().Msgf("query: %s; args: %s", sql, args)
+
+	_, err = conn.Exec(ctx, sql, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *repo) UpdateHero(ctx context.Context, hero game.Hero) error {
+	conn, err := r.pool.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	sql, args, err := psql.Update("heroes").
+		Set("name", hero.Name).
+		Set("description", hero.Description).
+		Set("user_id", hero.UserID).
+		Set("type_hero", hero.TypeHero.EnumIndex()).
+		Where(sq.Eq{"id": hero.ID}).
 		ToSql()
 	if err != nil {
 		return err

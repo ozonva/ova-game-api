@@ -93,3 +93,17 @@ func (mr *MockHeroRepoMockRecorder) RemoveHero(arg0, arg1 interface{}) *gomock.C
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveHero", reflect.TypeOf((*MockHeroRepo)(nil).RemoveHero), arg0, arg1)
 }
+
+// UpdateHero mocks base method.
+func (m *MockHeroRepo) UpdateHero(arg0 context.Context, arg1 game.Hero) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateHero", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateHero indicates an expected call of UpdateHero.
+func (mr *MockHeroRepoMockRecorder) UpdateHero(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateHero", reflect.TypeOf((*MockHeroRepo)(nil).UpdateHero), arg0, arg1)
+}

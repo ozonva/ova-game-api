@@ -38,6 +38,10 @@ func (h *Hero) GenerateName() {
 	h.Name = fmt.Sprintf("Hero №%s", h.ID.String())
 }
 
+func (h *Hero) SetDescription(description string) {
+	h.Description = description
+}
+
 func NewHero(userId uint64, typeHero TypeHero, name string) Hero {
 	hero := Hero{
 		UserID:   userId,
