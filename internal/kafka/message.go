@@ -13,7 +13,7 @@ const (
 	// Delete - Delete  via Producer
 	Delete MessageType = 4
 	// Describe - Describe  via Producer
-	Describe MessageType = 4
+	Describe MessageType = 5
 )
 
 // Message - message for Kafka
