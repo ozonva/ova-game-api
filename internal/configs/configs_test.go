@@ -6,21 +6,19 @@ import (
 )
 
 func TestConfigsLoad(t *testing.T) {
-	appConfig := App{
-		Name:        "APP_NAME",
-		Environment: "APP_ENV",
-		Debug:       false,
+	appConfig := App{}
+	databaseConfig := Database{}
+	kafkaConfig := Kafka{
+		Brokers: []*BrokerKafka{{}},
 	}
-	databaseConfig := Database{
-		DbName:         "",
-		Host:           "",
-		Port:           "",
-		Username:       "",
-		Password:       "",
-		PoolMaxConnect: 0,
+	metricsConfig := Metrics{
+		Prometheus: Prometheus{},
+		Jaeger:     Jaeger{},
 	}
 
 	LoadConfigs()
 	assert.Equal(t, appConfig, *AppConfig)
 	assert.Equal(t, databaseConfig, *DatabaseConfig)
+	assert.Equal(t, kafkaConfig, *KafkaConfig)
+	assert.Equal(t, metricsConfig, *MetricsConfig)
 }

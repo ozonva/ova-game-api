@@ -1,0 +1,6 @@
+{
+  "topic": "KAFKA_TOPIC",
+  "brokers": [
+    {"host": "KAFKA_HOST", "port":  "KAFKA_PORT"}
+  ]
+}

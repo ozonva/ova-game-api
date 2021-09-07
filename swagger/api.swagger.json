@@ -35,6 +35,27 @@
         },
         "type_hero": {
           "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "apiHeroRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "type_hero": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
         }
       }
     },
@@ -46,6 +67,14 @@
           "items": {
             "$ref": "#/definitions/apiHero"
           }
+        }
+      }
+    },
+    "apiUpdateHeroResponse": {
+      "type": "object",
+      "properties": {
+        "hero": {
+          "$ref": "#/definitions/apiHero"
         }
       }
     },

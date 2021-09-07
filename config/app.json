@@ -1,5 +1,8 @@
 {
   "name": "APP_NAME",
   "environment": "APP_ENV",
-  "debug": "APP_DEBUG"
+  "debug": "APP_DEBUG",
+  "grpc_port": "GRPC_PORT",
+  "saver_chunk_size": "SAVER_CHUNK_SIZE",
+  "saver_chunk_time": "SAVER_CHUNK_SECOND"
 }

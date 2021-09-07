@@ -1,0 +1,11 @@
+{
+  "prometheus": {
+    "host": "PROMETHEUS_HOST",
+    "port":  "PROMETHEUS_PORT",
+    "path":  "PROMETHEUS_PATH"
+  },
+  "jaeger": {
+    "host": "JAEGER_HOST",
+    "port":  "JAEGER_PORT"
+  }
+}

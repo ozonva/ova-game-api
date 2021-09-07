@@ -21,7 +21,7 @@ CREATE TABLE "heroes"(
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE "heroes" ADD CONSTRAINT "rule_foreign_key_user_id" FOREIGN KEY (user_id) REFERENCES "users"(id) ON DELETE CASCADE;
+ALTER TABLE "heroes" ADD CONSTRAINT "hero_foreign_key_user_id" FOREIGN KEY (user_id) REFERENCES "users"(id) ON DELETE CASCADE;
 
 -- +goose Down
 DROP TABLE "heroes";

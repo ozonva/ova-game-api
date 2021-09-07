@@ -19,9 +19,12 @@ const (
 )
 
 type App struct {
-	Name        string `json:"name"`
-	Environment string `json:"environment"`
-	Debug       bool   `json:"debug"`
+	Name           string `json:"name"`
+	Environment    string `json:"environment"`
+	Debug          bool   `json:"debug"`
+	GrpcPort       string `json:"grpc_port"`
+	SaverChunkSize uint   `json:"saver_chunk_size"`
+	SaverChunkTime uint   `json:"saver_chunk_time"`
 }
 
 type Database struct {
@@ -33,8 +36,36 @@ type Database struct {
 	PoolMaxConnect int    `json:"pool_max_connect"`
 }
 
+type Kafka struct {
+	Topic   string         `json:"topic"`
+	Brokers []*BrokerKafka `json:"brokers"`
+}
+
+type Metrics struct {
+	Prometheus Prometheus `json:"prometheus"`
+	Jaeger     Jaeger     `json:"jaeger"`
+}
+
+type Prometheus struct {
+	Host string `json:"host"`
+	Port string `json:"port"`
+	Path string `json:"path"`
+}
+
+type Jaeger struct {
+	Host string `json:"host"`
+	Port string `json:"port"`
+}
+
+type BrokerKafka struct {
+	Host string `json:"host"`
+	Port string `json:"port"`
+}
+
 var AppConfig *App
 var DatabaseConfig *Database
+var KafkaConfig *Kafka
+var MetricsConfig *Metrics
 
 type funcType func(string, interface{}) (interface{}, error)
 
@@ -44,9 +75,13 @@ func LoadConfigs() {
 
 	AppConfig = &App{}
 	DatabaseConfig = &Database{}
+	KafkaConfig = &Kafka{}
+	MetricsConfig = &Metrics{}
 	mapper := map[string]interface{}{
 		"app":      AppConfig,
 		"database": DatabaseConfig,
+		"kafka":    KafkaConfig,
+		"metrics":  MetricsConfig,
 	}
 
 	viper.SetConfigFile(configEnvPath)
@@ -105,9 +140,24 @@ func configParseEnv(config interface{}) {
 		cnf.Username = viper.GetString(cnf.Username)
 		cnf.Password = viper.GetString(cnf.Password)
 		cnf.PoolMaxConnect = viper.GetInt("DB_POOL_MAX_CONNECT")
-	case App:
+	case *Kafka:
+		cnf.Topic = viper.GetString(cnf.Topic)
+		for _, broker := range cnf.Brokers {
+			broker.Host = viper.GetString(broker.Host)
+			broker.Port = viper.GetString(broker.Port)
+		}
+	case *App:
 		cnf.Name = viper.GetString(cnf.Name)
 		cnf.Environment = viper.GetString(cnf.Environment)
 		cnf.Debug = viper.GetBool("APP_DEBUG")
+		cnf.GrpcPort = viper.GetString(cnf.GrpcPort)
+		cnf.SaverChunkSize = viper.GetUint("SAVER_CHUNK_SIZE")
+		cnf.SaverChunkTime = viper.GetUint("SAVER_CHUNK_SECOND")
+	case *Metrics:
+		cnf.Prometheus.Host = viper.GetString(cnf.Prometheus.Host)
+		cnf.Prometheus.Port = viper.GetString(cnf.Prometheus.Port)
+		cnf.Prometheus.Path = viper.GetString(cnf.Prometheus.Path)
+		cnf.Jaeger.Host = viper.GetString(cnf.Jaeger.Host)
+		cnf.Jaeger.Port = viper.GetString(cnf.Jaeger.Port)
 	}
 }
