@@ -99,6 +99,15 @@ services:
     ports:
       - "9090:9090"
 
+  godoc:
+    build:
+      context: ./
+      dockerfile: docker/godoc/Dockerfile
+    volumes:
+      - ./:/app:ro
+    ports:
+      - "${GODOC_PORT}:6060"
+
 networks:
   default:
 

@@ -3,14 +3,13 @@ package configs
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
-	"time"
 )
 
 const (
@@ -70,9 +69,6 @@ var MetricsConfig *Metrics
 type funcType func(string, interface{}) (interface{}, error)
 
 func LoadConfigs() {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
-	log := zerolog.New(output).With().Timestamp().Logger()
-
 	AppConfig = &App{}
 	DatabaseConfig = &Database{}
 	KafkaConfig = &Kafka{}
