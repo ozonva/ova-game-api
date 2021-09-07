@@ -6,29 +6,14 @@ import (
 )
 
 func TestConfigsLoad(t *testing.T) {
-	appConfig := App{
-		Name:           "",
-		Environment:    "",
-		Debug:          false,
-		GrpcPort:       "",
-		SaverChunkSize: 0,
-		SaverChunkTime: 0,
-	}
-	databaseConfig := Database{
-		DbName:         "",
-		Host:           "",
-		Port:           "",
-		Username:       "",
-		Password:       "",
-		PoolMaxConnect: 0,
-	}
+	appConfig := App{}
+	databaseConfig := Database{}
 	kafkaConfig := Kafka{
-		Topic:   "",
-		Brokers: []*BrokerKafka{{Host: "", Port: ""}},
+		Brokers: []*BrokerKafka{{}},
 	}
 	metricsConfig := Metrics{
-		Prometheus: Prometheus{Host: "", Port: "", Path: ""},
-		Jaeger:     Jaeger{Host: "", Port: ""},
+		Prometheus: Prometheus{},
+		Jaeger:     Jaeger{},
 	}
 
 	LoadConfigs()
