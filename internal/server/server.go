@@ -7,27 +7,26 @@ import (
 	"github.com/ozonva/ova-game-api/internal/db"
 	"github.com/ozonva/ova-game-api/internal/flusher"
 	"github.com/ozonva/ova-game-api/internal/kafka"
+	"github.com/ozonva/ova-game-api/internal/logs"
 	"github.com/ozonva/ova-game-api/internal/metrics"
 	"github.com/ozonva/ova-game-api/internal/repo"
 	"github.com/ozonva/ova-game-api/internal/saver"
 	"github.com/ozonva/ova-game-api/internal/tracer"
 	api "github.com/ozonva/ova-game-api/pkg/hero-api"
-	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"io"
 	"net"
-	"os"
 	"time"
 )
 
 func Run() error {
 	ctx := context.Background()
 
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+	logs.InitLogger()
+	defer logs.FileLogger.Close()
 
 	configs.LoadConfigs()
-
-	log := zerolog.New(output).With().Timestamp().Logger()
 
 	log.Info().Msg("starting server...")
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", configs.AppConfig.GrpcPort))
@@ -73,7 +72,7 @@ func Run() error {
 	repository := repo.NewHeroRepo(pool)
 	fsh := flusher.NewFlusher(configs.AppConfig.SaverChunkSize, repository)
 	svr := saver.NewSaver(ctx, configs.AppConfig.SaverChunkSize, fsh, time.Duration(configs.AppConfig.SaverChunkTime)*time.Second)
-	api.RegisterHeroApiServer(serverGrpc, NewHeroApiServer(&log, repository, svr, metricClient, kafkaClient))
+	api.RegisterHeroApiServer(serverGrpc, NewHeroApiServer(&log.Logger, repository, svr, metricClient, kafkaClient))
 	if err := serverGrpc.Serve(listen); err != nil {
 		log.Fatal().Msgf("failed to serve: %v", err)
 	}

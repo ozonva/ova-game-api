@@ -6,12 +6,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/ozonva/ova-game-api/internal/flusher"
+	"github.com/ozonva/ova-game-api/internal/logs"
 	"github.com/ozonva/ova-game-api/internal/mocks"
 	"github.com/ozonva/ova-game-api/internal/saver"
 	"github.com/ozonva/ova-game-api/pkg/game"
 	ovagameapi "github.com/ozonva/ova-game-api/pkg/hero-api"
-	"github.com/rs/zerolog"
-	"os"
+	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -49,8 +49,7 @@ var _ = Describe("HeroServer", func() {
 	)
 
 	BeforeEach(func() {
-		output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
-		log := zerolog.New(output).With().Timestamp().Logger()
+		logs.InitLogger()
 		ctrl = gomock.NewController(GinkgoT())
 		mockMetrics = mocks.NewMockMetrics(ctrl)
 		mockKafka = mocks.NewMockKafkaProducer(ctrl)
@@ -59,11 +58,12 @@ var _ = Describe("HeroServer", func() {
 		flusher_ := flusher.NewFlusher(10, mockRepo)
 		saver := saver.NewSaver(ctx, capacitySize, flusher_, flushTimeoutShortMillisecond)
 
-		api = NewHeroApiServer(&log, mockRepo, saver, mockMetrics, mockKafka)
+		api = NewHeroApiServer(&log.Logger, mockRepo, saver, mockMetrics, mockKafka)
 	})
 
 	AfterEach(func() {
 		ctrl.Finish()
+		logs.FileLogger.Close()
 	})
 
 	Context("CreateHero", func() {
